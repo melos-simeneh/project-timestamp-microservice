@@ -24,6 +24,39 @@ app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
 
+// If no date is provided (i.e., the user visits /api/), return the current date
+app.get("/api", function (req, res) {
+  let date = new Date();
+  res.json({
+    unix: date.getTime(),
+    utc: date.toUTCString()
+  });
+});
+
+// Your main API route for a specific date (either Unix timestamp or natural date)
+app.get("/api/:date", function (req, res) {
+  let dateString = req.params.date;
+  let date;
+
+  // If the date string is a number, convert it to a timestamp (e.g., Unix timestamp in ms)
+  if (!isNaN(dateString)) {
+    date = new Date(parseInt(dateString));
+  } else {
+    // Otherwise, treat it as a regular date string
+    date = new Date(dateString);
+  }
+
+  // If the date is invalid, return an error message
+  if (date.toString() === 'Invalid Date') {
+    return res.json({ error: "Invalid Date" });
+  }
+
+  // Format the response to return both the Unix timestamp and natural date
+  res.json({
+    unix: date.getTime(),
+    utc: date.toUTCString()
+  });
+});
 
 
 // Listen on port set in environment variable or default to 3000
